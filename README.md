@@ -1,0 +1,2 @@
+# libGT20L16J1Y
+KanjiROM
