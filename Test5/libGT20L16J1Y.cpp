@@ -3,7 +3,7 @@
 
 #define GT20L16ADDRESS 0x03
 
-#define DEBUG
+#define DEBUGA
 
 #ifdef DEBUG
 #define debug(...) {Serial.println(__VA_ARGS__);}
@@ -25,8 +25,8 @@ void CGT20L::init(int CLK, int MOSI, int MISO, int SS){
   pinMode (m_SS, OUTPUT);
   SPI.begin ();
   SPI.setBitOrder(MSBFIRST);
-  SPI.setDataMode(3);
-  SPI.setClockDivider(SPI_CLOCK_DIV16);
+  SPI.setDataMode(0);
+  SPI.setClockDivider(SPI_CLOCK_DIV2);
 }
 
 // 漢字ROMと通信する
@@ -112,22 +112,25 @@ int CGT20L::getMatrixData(uint8_t *data, int num){
     if(j == num){ // 欲しい文字だったので取り出す
         if ( (m_strings[i] < 0x80) || ((0xA0 < m_strings[i]) && (m_strings[i] <= 0xdF)) ) {
         getSJIS1byte(m_strings[i], data);
-        copyMatrix16(data, sizeof(matrixdata16)); //表示するため
-        showDotsToSerial16();                     //表示する
+#ifdef DEBUG
+     copyMatrix16(data, sizeof(matrixdata16)); //表示するため
+     showDotsToSerial16();                     //表示する
+#endif
         return 16;
       } else {
         uint16_t code =  ((m_strings[i] << 8) + m_strings[++i]);
         uint8_t tmp[32];
         getSJIS2byte(code, data);
-        copyMatrix32(data, sizeof(matrixdata32)); //表示するため
-        showDotsToSerial32();                     //表示する
+#ifdef DEBUG
+     copyMatrix32(data, sizeof(matrixdata32)); //表示するため
+     showDotsToSerial32();                     //表示する
+#endif
         return 32;
       }
     }
 
     // 欲しい文字じゃなかったら飛ばす
     if ( (m_strings[i] < 0x80) || ((0xA0 < m_strings[i]) && (m_strings[i] <= 0xdF)) ) { } else i++;
-   
   }
   return 0;
 }
